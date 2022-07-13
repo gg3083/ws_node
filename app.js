@@ -5,13 +5,20 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
-var wsRouter = require('./routes/ws');
+var waRouter = require('./routes/wa');
+var baiduRouter = require('./routes/baidu');
+var wsRouter = require('./routes/ws').router;
+var ejs = require('ejs');
+
 
 var app = express();
+var expressWs = require('express-ws')(app);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.engine('html', ejs.__express);
+
+app.set('view engine', 'html');
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -29,8 +36,9 @@ app.use(function (req, res, next) {
 })
 
 
-
 app.use('/ws', wsRouter);
+app.use('/wa', waRouter);
 app.use('/', indexRouter);
+app.use('/baidu', baiduRouter);
 
 module.exports = app;

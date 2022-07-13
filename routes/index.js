@@ -4,6 +4,13 @@ const multipart = require('connect-multiparty');
 var multipartMiddleware = multipart();
 
 
+router.get('/', function (req, res, next) {
+    res.render('index', {
+        title: 'NodeJs',
+        qr: '1111111111111'
+    })
+})
+
 router.get('/get/:id', function (req, res, next) {
     let id = `${req.params.id}`;
     res.send({

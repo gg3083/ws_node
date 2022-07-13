@@ -1,40 +1,47 @@
-const express = require('express');
-const router = express.Router();
-const multipart = require('connect-multiparty');
-var multipartMiddleware = multipart();
-const qrCode = require('qrcode-terminal');
+var express = require('express');
+var expressWs = require('express-ws');
 
-const initClient = require('../pkg/whatsapp_client')
 
-router.post('/create', multipartMiddleware, function (req, res, next) {
-    let clientId = `${req.body.clientId}`;
+var clients = new Set()
+var router = express.Router();
+expressWs(router);
 
-    console.log('body:', req.body)
+router.ws('/qrCode', function (ws, req) {
+    console.log('req:', req.params.id)
+    console.log('connect success')
+    // console.log(ws)
+    clients.add(ws)
+    // 使用 ws 的 send 方法向连接另一端的客户端发送数据
+    // ws.send('connect to express server with WebSocket success')
 
-    let client = initClient(clientId);
-    client.initialize().then(r => {
-        console.log('init', r)
+    // 使用 on 方法监听事件
+    //   message 事件表示从另一段（服务端）传入的数据
+    ws.on('message', function (msg) {
+        console.log(`receive message ${msg}`)
+        ws.send(JSON.stringify({
+            data: `default`
+        }))
     })
 
-    client.on('qr', (qr) => {
-        console.log('QR RECEIVED', qr);
-        qrCode.generate(qr, {});
-    });
+    // 设置定时发送消息
+    let timer = setInterval(() => {
+        ws.send(JSON.stringify({
+            data: `interval message ${new Date()}`
+        }))
+    }, 5000)
 
-    client.on('authenticated', () => {
-        console.log('AUTHENTICATED');
-    });
+    // close 事件表示客户端断开连接时执行的回调函数
+    ws.on('close', function (e) {
+        console.log('close connection')
+        clearInterval(timer)
+        timer = undefined
+    })
+    // console.log('clients:::', clients)
+})
 
-    client.on('ready', () => {
-        console.log('READY');
-    });
 
-    res.send({
-        code: 0, msg: 'ok', data: {
-            "clientId": clientId,
-            "body": req.body,
-        }
-    });
-
-});
-module.exports = router;
+module.exports =
+{
+    router,
+    clients
+}
