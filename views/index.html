@@ -40,7 +40,7 @@
         if (typeof WebSocket == 'undefined') {
             alert('您的浏览器不支持该软件')
         }
-        let wsUrl = `ws://127.0.0.1:9001/ws/qrCode`
+        let wsUrl = `ws://192.168.0.47:9001/ws/qrCode`
         websocket = new WebSocket(wsUrl)
         websocket.onopen = onOpen
         websocket.onmessage = onMsg

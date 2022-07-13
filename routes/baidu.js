@@ -26,11 +26,15 @@ router.post('/create', multipartMiddleware, function (req, res, next) {
 
 const initClient = async (clientId) => {
     const browser = await puppeteer.launch({
-        headless: false,
-        slowMo: 100,
+        headless: true,
+        // slowMo: 100,
+        args: [
+            "--no-sandbox",
+            "--disable-setuid-sandbox"
+        ]
     })
     const page = (await browser.pages())[0]
-    await page.goto(`https://www.baidu.com/?clientId=${clientId}`).then(res =>{
+    await page.goto(`https://www.baidu.com/?clientId=${clientId}`).then(res => {
         console.log('res', res)
         //数据改变后将结果推送至客户端
         for (let c of clients) {
