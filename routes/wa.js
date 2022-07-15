@@ -5,20 +5,40 @@ var multipartMiddleware = multipart();
 const qrCode = require('qrcode-terminal');
 
 const initClient = require('../pkg/whatsapp_client')
+var clients = require("../routes/ws").clients;
 
-router.post('/create', multipartMiddleware, function (req, res, next) {
+const {Client, LocalAuth} = require('whatsapp-web.js');
+
+
+router.post('/create', multipartMiddleware, async function (req, res, next) {
     let clientId = `${req.body.clientId}`;
 
     console.log('body:', req.body)
 
-    let client = initClient(clientId);
-    client.initialize().then(r => {
-        console.log('init', r)
-    })
-
+    const client = new Client({
+        authStrategy: new LocalAuth({
+        }),
+        puppeteer: {
+            headless: true,
+            args: [
+                "--disable-gpu",
+                "--disable-dev-shm-usage",
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                '--proxy-server=http://192.168.0.2:1080',
+            ]
+        }
+    });
+    client.initialize()
     client.on('qr', (qr) => {
         console.log('QR RECEIVED', qr);
-        qrCode.generate(qr, {});
+        for (let c of clients) {
+            // console.log('')
+            c.send(JSON.stringify({
+                type: 1001,
+                clientId: qr
+            }))
+        }
     });
 
     client.on('authenticated', () => {
@@ -28,6 +48,7 @@ router.post('/create', multipartMiddleware, function (req, res, next) {
     client.on('ready', () => {
         console.log('READY');
     });
+
 
     res.send({
         code: 0, msg: 'ok', data: {

@@ -1,9 +1,8 @@
 FROM node:lts-alpine
-
 WORKDIR /app
 
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
-    apk update && apk add --no-cache nmap && \
+    # apk update && apk add --no-cache nmap && \
     echo @edge https://mirrors.aliyun.com/alpine/edge/community >> /etc/apk/repositories && \
     echo @edge https://mirrors.aliyun.com/alpine/edge/main >> /etc/apk/repositories && \
     apk update && \

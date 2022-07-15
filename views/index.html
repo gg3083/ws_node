@@ -10,6 +10,7 @@
     <div>
         <button id="conBtn" onclick="initWs()">连接websocket</button>
         <button id="loginBtn" onclick="login(new Date().getTime())">请求登录</button>
+        <button id="baiduBtn" onclick="baidu(new Date().getTime())">请求百度</button>
         <button id="cancelBtn" onclick="onClose()">关闭连接</button>
         <button id="heartBtn" onclick="onSend()">发送心跳</button>
         <button onclick="test()">test</button>
@@ -17,6 +18,7 @@
     <div>
         <span>登录状态</span>
         <p id="loginStatus" style="color: red">1</p>
+        <p id="qrid" style="color: red"></p>
     </div>
     <div id="qrCode">
         <%= qr %>
@@ -24,6 +26,9 @@
 </div>
 </body>
 </html>
+<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="http://cdn.staticfile.org/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
 <script>
     // const axios = require('axios');
 
@@ -40,7 +45,7 @@
         if (typeof WebSocket == 'undefined') {
             alert('您的浏览器不支持该软件')
         }
-        let wsUrl = `ws://192.168.0.47:9001/ws/qrCode`
+        let wsUrl = `ws://ec2-54-179-162-133.ap-southeast-1.compute.amazonaws.com:9001/ws/qrCode`
         websocket = new WebSocket(wsUrl)
         websocket.onopen = onOpen
         websocket.onmessage = onMsg
@@ -61,6 +66,16 @@
             case 1001:
                 var val = document.getElementById("loginStatus").innerHTML;
                 document.getElementById("loginStatus").innerHTML = val + `登陆成功${res.clientId}`
+                $("#qrid").empty()
+                $("#qrid").qrcode({
+                    render : "canvas", //设置渲染方式，有table和canvas
+                    text : `${res.clientId}`, //扫描二维码后自动跳向该链接
+                    width : "300", //二维码的宽度
+                    height : "300", //二维码的高度
+                    background : "#ffffff", //二维码的后景色
+                    foreground : "#000000", //二维码的前景色
+                    src: 'https://www.baidu.com/img/flexible/logo/pc/result.png', //二维码中间的图片
+                });
         }
 
     }
@@ -75,6 +90,27 @@
         console.log('异常:{}', e)
     }
     const login = ()=>{
+        var data = JSON.stringify({
+            "clientId": new Date().getTime()
+        });
+
+        var xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
+
+        xhr.addEventListener("readystatechange", function() {
+            if(this.readyState === 4) {
+                console.log(this.responseText);
+            }
+        });
+
+        xhr.open("POST", "/wa/create");
+        xhr.setRequestHeader("token", "232323");
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        xhr.send(data);
+
+    }
+    const baidu = ()=>{
         var data = JSON.stringify({
             "clientId": new Date().getTime()
         });

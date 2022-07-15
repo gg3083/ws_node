@@ -30,11 +30,12 @@ const initClient = async (clientId) => {
         // slowMo: 100,
         args: [
             "--no-sandbox",
-            "--disable-setuid-sandbox"
+            "--disable-setuid-sandbox",
+            '--proxy-server=http://192.168.0.2:1080',
         ]
     })
     const page = (await browser.pages())[0]
-    await page.goto(`https://www.baidu.com/?clientId=${clientId}`).then(res => {
+    await page.goto(`https://www.google.com.hk/?clientId=${clientId}`).then(res => {
         console.log('res', res)
         //数据改变后将结果推送至客户端
         for (let c of clients) {

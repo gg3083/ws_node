@@ -1,14 +1,11 @@
-const { Client, LocalAuth } = require('whatsapp-web.js');
+// const {Client, LocalAuth} = require('whatsapp-web.js');
+const { Client, RemoteAuth } = require('whatsapp-web.js');
 
 
-const initClient = function (clientId){
+
+
+const initClient = async  (clientId) => {
     console.log('start:', clientId)
-    return new Client({
-            clientId: clientId,
-            authStrategy: new LocalAuth(),
-            puppeteer: { headless: false, browserWSEndpoint: null }
-        }
-    );
 }
 
 
