@@ -9,7 +9,7 @@
     <h1><%= title %></h1>
     <div>
         <button id="conBtn" onclick="initWs()">连接websocket</button>
-        <button id="loginBtn" onclick="login(new Date().getTime())">请求登录</button>
+        <button id="loginBtn" onclick="login('<%= token %>')">请求登录</button>
         <button id="baiduBtn" onclick="baidu(new Date().getTime())">请求百度</button>
         <button id="cancelBtn" onclick="onClose()">关闭连接</button>
         <button id="heartBtn" onclick="onSend()">发送心跳</button>
@@ -45,7 +45,8 @@
         if (typeof WebSocket == 'undefined') {
             alert('您的浏览器不支持该软件')
         }
-        let wsUrl = `ws://ec2-54-179-162-133.ap-southeast-1.compute.amazonaws.com:9001/ws/qrCode`
+        // let wsUrl = `ws://ec2-54-179-162-133.ap-southeast-1.compute.amazonaws.com:9001/ws/qrCode`
+        let wsUrl = '<%= wsUrl %>'+"?token="+'<%= token %>'
         websocket = new WebSocket(wsUrl)
         websocket.onopen = onOpen
         websocket.onmessage = onMsg
@@ -76,8 +77,12 @@
                     foreground : "#000000", //二维码的前景色
                     src: 'https://www.baidu.com/img/flexible/logo/pc/result.png', //二维码中间的图片
                 });
+                break
+            case 1002:
+                $("#qrid").empty()
+                alert(`用户${res.clientId} ${res.msg}`)
+                break
         }
-
     }
     const onSend = (e) => {
         console.log('heart', e)
@@ -89,9 +94,9 @@
     const onError = (e) => {
         console.log('异常:{}', e)
     }
-    const login = ()=>{
+    const login = (token)=>{
         var data = JSON.stringify({
-            "clientId": new Date().getTime()
+            "clientId": token
         });
 
         var xhr = new XMLHttpRequest();

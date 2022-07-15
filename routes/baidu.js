@@ -4,7 +4,7 @@ const multipart = require('connect-multiparty');
 var multipartMiddleware = multipart();
 // const qrCode = require('qrcode-terminal');
 const puppeteer = require('puppeteer')
-var clients = require("../routes/ws").clients;
+var clients = require("../routes/ws").wsClients;
 
 router.post('/create', multipartMiddleware, function (req, res, next) {
     let clientId = `${req.body.clientId}`;
@@ -25,15 +25,18 @@ router.post('/create', multipartMiddleware, function (req, res, next) {
 });
 
 const initClient = async (clientId) => {
+    var puppeteerArgs = [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+    ]
+    if (process.argv && process.argv.length >=2 && process.argv[2]){
+        puppeteerArgs.push(process.argv[2])
+    }
     const browser = await puppeteer.launch({
         headless: true,
-        // slowMo: 100,
-        args: [
-            "--no-sandbox",
-            "--disable-setuid-sandbox",
-            '--proxy-server=http://192.168.0.2:1080',
-        ]
+        args: puppeteerArgs
     })
+
     const page = (await browser.pages())[0]
     await page.goto(`https://www.google.com.hk/?clientId=${clientId}`).then(res => {
         console.log('res', res)

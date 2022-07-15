@@ -2,15 +2,16 @@ var express = require('express');
 var expressWs = require('express-ws');
 
 
-var clients = new Set()
+var wsClients = new Map()
 var router = express.Router();
 expressWs(router);
 
 router.ws('/qrCode', function (ws, req) {
-    console.log('req:', req.params.id)
+    console.log('req:', req.query.token)
     console.log('connect success')
     // console.log(ws)
-    clients.add(ws)
+    ws.clientToken = req.params.token
+    wsClients.set(req.query.token, ws)
     // 使用 ws 的 send 方法向连接另一端的客户端发送数据
     // ws.send('connect to express server with WebSocket success')
 
@@ -43,5 +44,5 @@ router.ws('/qrCode', function (ws, req) {
 module.exports =
 {
     router,
-    clients
+    wsClients
 }

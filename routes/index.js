@@ -5,9 +5,18 @@ var multipartMiddleware = multipart();
 
 
 router.get('/', function (req, res, next) {
+    console.log('process.argv', process.argv, "--", process.argv[2], "--", process.argv[3])
+
+    if (!process.argv[3]){
+        res.send({
+            code: 1, msg: '初始化websocket失败！',
+        });
+    }
     res.render('index', {
         title: 'NodeJs',
-        qr: '1111111111111'
+        qr: '',
+        wsUrl: process.argv[3],
+        token: new Date().getTime(),
     })
 })
 
