@@ -8,6 +8,7 @@
 <div>
     <h1><%= title %></h1>
     <div>
+        <button id="" onclick="getToken()">获取token</button>
         <button id="conBtn" onclick="initWs()">连接websocket</button>
         <button id="loginBtn" onclick="login('<%= token %>')">请求登录</button>
         <button id="baiduBtn" onclick="baidu(new Date().getTime())">请求百度</button>
@@ -17,6 +18,8 @@
     </div>
     <div>
         <span>登录状态</span>
+
+        <p ><span>token:</span><span id="tokenStr" style="color: red"></span></p>
         <p id="loginStatus" style="color: red">1</p>
         <p id="qrid" style="color: red"></p>
     </div>
@@ -38,6 +41,31 @@
         console.log(val)
     }
 
+    const getToken = () =>{
+        // var num= Math.floor(Math.random()*4+1);
+        var num= 2
+        var data = JSON.stringify({
+            "username": `user${num}`
+        });
+
+        var xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
+
+        xhr.addEventListener("readystatechange", function() {
+            if(this.readyState === 4) {
+                var res = JSON.parse(this.responseText);
+                var token = res.data.token;
+                $("#tokenStr").text(token)
+            }
+        });
+
+        xhr.open("POST", "/auth/token");
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        xhr.send(data);
+    }
+
+
     let websocket = null
 
     const initWs = () => {
@@ -46,7 +74,9 @@
             alert('您的浏览器不支持该软件')
         }
         // let wsUrl = `ws://ec2-54-179-162-133.ap-southeast-1.compute.amazonaws.com:9001/ws/qrCode`
-        let wsUrl = '<%= wsUrl %>'+"?token="+'<%= token %>'
+        let token = $("#tokenStr").text()
+        // let token = 1
+        let wsUrl = '<%= wsUrl %>'+"?token="+`${token}`
         websocket = new WebSocket(wsUrl)
         websocket.onopen = onOpen
         websocket.onmessage = onMsg
@@ -94,9 +124,8 @@
     const onError = (e) => {
         console.log('异常:{}', e)
     }
-    const login = (token)=>{
+    const login = ()=>{
         var data = JSON.stringify({
-            "clientId": token
         });
 
         var xhr = new XMLHttpRequest();
@@ -107,9 +136,10 @@
                 console.log(this.responseText);
             }
         });
+        let token = $("#tokenStr").text()
 
         xhr.open("POST", "/wa/create");
-        xhr.setRequestHeader("token", "232323");
+        xhr.setRequestHeader("token", token);
         xhr.setRequestHeader("Content-Type", "application/json");
 
         xhr.send(data);

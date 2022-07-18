@@ -11,7 +11,12 @@ const {Client, LocalAuth} = require('whatsapp-web.js');
 var userClient = new Map()
 
 router.post('/create', multipartMiddleware, function (req, res, next) {
-    let clientId = `${req.body.clientId}`;
+    // let clientId = `${req.body.clientId}`;
+    console.log('body:', req.body)
+    console.log('body:', req.query)
+    console.log('body:', req.params)
+
+    let clientId = req.body.tokenBody.username
 
     console.log('body:', req.body)
 
@@ -94,12 +99,12 @@ router.get('/get', function (req, res, next) {
 })
 
 
-router.get('/register/:token/:phone', function (req, res, next) {
-    let token = `${req.params.token}`;
+router.get('/register/:phone', function (req, res, next) {
+    let username = `${req.params.tokenBody.username}`;
     let phone = `${req.params.phone}`;
     console.log(phone)
 
-    const client = userClient.get(token)
+    const client = userClient.get(username)
 
     if (!client) {
         res.send({

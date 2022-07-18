@@ -7,11 +7,13 @@ var router = express.Router();
 expressWs(router);
 
 router.ws('/qrCode', function (ws, req) {
-    console.log('req:', req.query.token)
+    // console.log('req:', req.query)
+    // console.log('req:', req.params)
+    // console.log('req:', req.query.tokenBody.username)
     console.log('connect success')
     // console.log(ws)
-    ws.clientToken = req.params.token
-    wsClients.set(req.query.token, ws)
+    ws.clientId = req.query.tokenBody.username
+    wsClients.set(req.query.tokenBody.username, ws)
     // 使用 ws 的 send 方法向连接另一端的客户端发送数据
     // ws.send('connect to express server with WebSocket success')
 
