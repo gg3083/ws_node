@@ -29,7 +29,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // const beginUrl = []
-const beginNotTokenUrl = ['/', '/auth/token']
+const beginNotTokenUrl = ['/', '/auth/token', "/baidu/create"]
 // const beginNotTokenUrl = []
 const beginNotAuthUrl = ['/ws/qrCode/.websocket']
 
